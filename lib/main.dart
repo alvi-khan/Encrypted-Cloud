@@ -1,4 +1,6 @@
-import 'package:encrypted_cloud/AccountManager.dart';
+import 'package:encrypted_cloud/FileViewer.dart';
+import 'package:encrypted_cloud/GoogleAccount.dart';
+import 'package:encrypted_cloud/GoogleDrive.dart';
 import 'package:encrypted_cloud/SignInPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +10,8 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => AccountManager()),
+        ChangeNotifierProvider(create: (context) => GoogleAccount()),
+        ChangeNotifierProvider(create: (context) => GoogleDrive()),
       ],
       child: const MyApp(),
     ),
@@ -37,8 +40,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SignInPage(),
+    return Consumer<GoogleAccount>(
+      builder: (context, account, child) {
+        return Scaffold(
+          backgroundColor: Colors.blueGrey.shade800,
+          body: account.user == null ? const SignInPage() : const FileViewer()
+        );
+      }
     );
   }
 }

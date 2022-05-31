@@ -15,6 +15,7 @@ dependencies:
   googleapis: any
   google_sign_in: any
   provider: ^6.0.3
+  file_picker: ^4.6.0
 
 dev_dependencies:
   flutter_test:
