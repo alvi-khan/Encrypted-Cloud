@@ -16,6 +16,7 @@ dependencies:
   google_sign_in: any
   provider: ^6.0.3
   file_picker: ^4.6.0
+  aes_crypt_null_safe: ^2.0.2
 
 dev_dependencies:
   flutter_test:

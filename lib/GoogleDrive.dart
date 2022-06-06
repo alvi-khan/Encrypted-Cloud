@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:encrypted_cloud/EncryptionHandler.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import "package:http/http.dart";
@@ -19,19 +21,31 @@ class AuthClient extends BaseClient {
 }
 
 class GoogleDrive extends ChangeNotifier{
-  List<drive.File> files = [];
+  List<File> files = [];
   bool newUploads = false;
+  var tempDir = Directory.systemTemp.createTempSync();
+  EncryptionHandler encryptionHandler = EncryptionHandler();
 
-  Future<String?> createRoot(GoogleSignInAccount account) async {
+  /// Create new root folder or retrieve existing one.
+  Future<String?> getRoot(GoogleSignInAccount account) async {
     final client = Client();
     var header = await account.authHeaders;
     var authClient = AuthClient(client, header);
     var api = drive.DriveApi(authClient);
     var response = await api.files.list(
-        q: "name='Encrypted Cloud' and mimeType='application/vnd.google-apps.folder'"
+        q: "name='Encrypted Cloud' and mimeType='application/vnd.google-apps.folder'",
+        $fields: "files(id, trashed)"
     );
     if (response.files == null) return null;
-    if (response.files!.isNotEmpty)  return response.files![0].id;
+
+    // retrieve first non-trashed root
+    if (response.files!.isNotEmpty) {
+      for (drive.File file in response.files!) {
+        if (!file.trashed!)  return file.id;
+      }
+    }
+
+    // if no root found or existing ones trashed
     drive.File file = await api.files.create(
       drive.File(name: 'Encrypted Cloud', mimeType: "application/vnd.google-apps.folder")
     );
@@ -39,8 +53,8 @@ class GoogleDrive extends ChangeNotifier{
   }
 
   void uploadFiles(GoogleSignInAccount user) async {
-    String? root = await createRoot(user);
-    if (root == null) return;
+    String? root = await getRoot(user);
+    if (root == null) return; // TODO show error
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result == null) return;
@@ -54,31 +68,48 @@ class GoogleDrive extends ChangeNotifier{
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
     for (var i = 0; i < files.length; i++) {
-      var driveFile = drive.File(name: names[i] ?? DateTime.now().toString(), parents: [root]);
+      String filename = names[i] ?? DateTime.now().toString();
+      var driveFile = drive.File(name: "$filename.aes", parents: [root]);
+      File encryptedFile = encryptionHandler.encryptFile(tempDir.path, files[i]);
       final result = await api.files.create(
           driveFile,
-          uploadMedia: drive.Media(files[i].openRead(), files[i].lengthSync())
+          uploadMedia: drive.Media(encryptedFile.openRead(), encryptedFile.lengthSync())
       );
+      // TODO show error
     }
 
     newUploads = true;
     notifyListeners();
   }
 
+  Future<File?> downloadFile(drive.DriveApi api, drive.File driveFile) async {
+    String filename = driveFile.name ?? DateTime.now().toString();
+    File file = File("${tempDir.path}${Platform.pathSeparator}$filename");
+
+    drive.Media media = await api.files.get(driveFile.id!, downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
+    List<int> dataStore = [];
+
+    await for (final data in media.stream) {
+      dataStore.addAll(data);
+    }
+    file.writeAsBytesSync(dataStore);
+    if (filename.endsWith(".aes")) {
+      file = encryptionHandler.decryptFile(tempDir.path, file);
+    }
+    return file;
+  }
+
   Future<void> getFiles(GoogleSignInAccount account) async {
+    String? root = await getRoot(account);
+    if (root == null) return; // TODO display error
+
     final client = Client();
     var header = await account.authHeaders;
     var authClient = AuthClient(client, header);
     var api = drive.DriveApi(authClient);
 
-    var response = await api.files.list(
-        q: "name='Encrypted Cloud' and mimeType='application/vnd.google-apps.folder'"
-    );
-    String? root = response.files?[0].id;
-    if (root == null) return;
-
     String? pageToken;
-    List<drive.File> newFiles = [];
+    List<File> newFiles = [];
     do {
       var fileList = await api.files.list(
           q: "'$root' in parents",
@@ -86,10 +117,15 @@ class GoogleDrive extends ChangeNotifier{
           pageToken: pageToken,
           supportsAllDrives: false,
           spaces: "drive",
-          $fields: "nextPageToken, files(id, name, mimeType, thumbnailLink)"
+          $fields: "nextPageToken, files(id, name, mimeType, hasThumbnail, thumbnailLink)"
       );
       pageToken = fileList.nextPageToken;
-      newFiles.addAll(fileList.files!.toList());
+      if (fileList.files != null) {
+        for (var driveFile in fileList.files!) {
+          if (driveFile.name == null || !driveFile.name!.endsWith(".aes"))  continue;
+          File? file = await downloadFile(api, driveFile);
+          if (file != null) newFiles.add(file);
+        }}
     } while (pageToken != null);
 
     files = newFiles;
