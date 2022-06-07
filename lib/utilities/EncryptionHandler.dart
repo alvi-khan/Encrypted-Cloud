@@ -6,6 +6,7 @@ class EncryptionHandler {
   var crypt = AesCrypt();
 
   EncryptionHandler() {
+    if (password != null) crypt.setPassword(password!);
     crypt.setOverwriteMode(AesCryptOwMode.rename);
   }
 
