@@ -1,3 +1,4 @@
+import 'package:encrypted_cloud/components/PasswordDialog.dart';
 import 'package:encrypted_cloud/utilities/GoogleAccount.dart';
 import 'package:encrypted_cloud/utilities/GoogleDrive.dart';
 import 'package:encrypted_cloud/components/FileCard.dart';
@@ -21,11 +22,19 @@ class _FileViewerState extends State<FileViewer> {
   void initState() {
     super.initState();
     account = Provider.of<GoogleAccount>(context, listen: false);
-    loadFiles();
+    Future.delayed(Duration.zero, () => loadFiles());
   }
 
   void loadFiles() async {
-    await Provider.of<GoogleDrive>(context, listen: false).getFiles(account.user!);
+    GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
+    if (drive.encryptionHandler.password == null) {
+      String password = await showDialog(
+          context: context,
+          builder: (context) => PasswordDialog()
+      );
+      drive.encryptionHandler.setPassword(password);
+    }
+    await drive.getFiles(account.user!);
     setState(() => loading = false);
   }
 

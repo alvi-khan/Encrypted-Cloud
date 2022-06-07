@@ -84,7 +84,7 @@ class GoogleDrive extends ChangeNotifier{
 
   Future<File?> downloadFile(drive.DriveApi api, drive.File driveFile) async {
     String filename = driveFile.name ?? DateTime.now().toString();
-    File file = File("${tempDir.path}${Platform.pathSeparator}$filename");
+    File? file = File("${tempDir.path}${Platform.pathSeparator}$filename");
 
     drive.Media media = await api.files.get(driveFile.id!, downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
     List<int> dataStore = [];
@@ -94,7 +94,12 @@ class GoogleDrive extends ChangeNotifier{
     }
     file.writeAsBytesSync(dataStore);
     if (filename.endsWith(".aes")) {
-      file = encryptionHandler.decryptFile(tempDir.path, file);
+      try {
+        file = encryptionHandler.decryptFile(tempDir.path, file);
+      } catch(exception) {
+        file = null;
+        // TODO display error
+      }
     }
     return file;
   }

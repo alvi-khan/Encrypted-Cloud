@@ -2,12 +2,15 @@ import 'dart:io';
 import 'package:aes_crypt_null_safe/aes_crypt_null_safe.dart';
 
 class EncryptionHandler {
-  String password = "Hello World!";
+  String? password;
   var crypt = AesCrypt();
 
   EncryptionHandler() {
-    crypt.setPassword(password);
     crypt.setOverwriteMode(AesCryptOwMode.rename);
+  }
+
+  void setPassword(String password) {
+    crypt.setPassword(password);
   }
 
   File encryptFile(String directory, File file) {
