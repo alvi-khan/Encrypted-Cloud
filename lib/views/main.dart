@@ -1,7 +1,7 @@
-import 'package:encrypted_cloud/FileViewer.dart';
-import 'package:encrypted_cloud/GoogleAccount.dart';
-import 'package:encrypted_cloud/GoogleDrive.dart';
-import 'package:encrypted_cloud/SignInPage.dart';
+import 'package:encrypted_cloud/views/FileViewer.dart';
+import 'package:encrypted_cloud/utilities/GoogleAccount.dart';
+import 'package:encrypted_cloud/utilities/GoogleDrive.dart';
+import 'package:encrypted_cloud/views/SignInPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
