@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:encrypted_cloud/utilities/GoogleDrive.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 class Fullscreen extends StatefulWidget {
@@ -20,21 +21,19 @@ class _FullscreenState extends State<Fullscreen> {
   Widget build(BuildContext context) {
     List<File> files = Provider.of<GoogleDrive>(context, listen: false).files;
     files = files.where((file) => validExtensions.any(file.path.endsWith)).toList();
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            height: MediaQuery.of(context).size.height,
-            initialPage: files.indexOf(widget.tappedFile),
-            enableInfiniteScroll: false,
-            viewportFraction: 1,
-          ),
-          items: files.map((file) {
-            return Image.file(file);
-          }).toList(),
-        ),
-      ),
+    PageController controller = PageController(initialPage: files.indexOf(widget.tappedFile));
+
+    return PhotoViewGallery.builder(
+      enableRotation: false,
+      scrollPhysics: const BouncingScrollPhysics(),
+      itemCount: files.length,
+      pageController: controller,
+      builder: (BuildContext context, int index) {
+        return PhotoViewGalleryPageOptions(
+            imageProvider: FileImage(files[index]),
+            minScale: PhotoViewComputedScale.contained,
+        );
+      },
     );
   }
 }

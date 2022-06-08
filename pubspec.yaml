@@ -1,5 +1,5 @@
 name: encrypted_cloud
-description:
+description: ""
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -17,7 +17,7 @@ dependencies:
   provider: ^6.0.3
   file_picker: ^4.6.0
   aes_crypt_null_safe: ^2.0.2
-  carousel_slider: ^4.1.1
+  photo_view: ^0.14.0
 
 dev_dependencies:
   flutter_test:
