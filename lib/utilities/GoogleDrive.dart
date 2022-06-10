@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:encrypted_cloud/enums/FileState.dart';
 import 'package:encrypted_cloud/utilities/EncryptionHandler.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import "package:http/http.dart";
 import 'package:google_sign_in/google_sign_in.dart';
@@ -70,7 +71,7 @@ class GoogleDrive extends ChangeNotifier{
     for (var i = 0; i < files.length; i++) {
       String filename = names[i] ?? DateTime.now().toString();
       var driveFile = drive.File(name: "$filename.aes", parents: [root]);
-      File encryptedFile = encryptionHandler.encryptFile(tempDir.path, files[i]);
+      File encryptedFile = await compute(encryptionHandler.encryptFile, MapEntry(tempDir.path, files[i]));
       final result = await api.files.create(
           driveFile,
           uploadMedia: drive.Media(encryptedFile.openRead(), encryptedFile.lengthSync())
@@ -95,7 +96,7 @@ class GoogleDrive extends ChangeNotifier{
     file.writeAsBytesSync(dataStore);
     if (filename.endsWith(".aes")) {
       try {
-        file = encryptionHandler.decryptFile(tempDir.path, file);
+        file = await compute(encryptionHandler.decryptFile, MapEntry(tempDir.path, file));
       } catch(exception) {
         file = null;
         // TODO display error

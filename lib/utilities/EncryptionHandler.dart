@@ -14,18 +14,22 @@ class EncryptionHandler {
     crypt.setPassword(password);
   }
 
-  File encryptFile(String directory, File file) {
+  Future<File> encryptFile(MapEntry<String, File> args) async {
+    String directory = args.key;
+    File file = args.value;
     String filename = file.path.split(Platform.pathSeparator).last;
     File encryptedFile = File("$directory${Platform.pathSeparator}$filename.aes");
-    crypt.encryptDataToFileSync(file.readAsBytesSync(), encryptedFile.path);
+    await crypt.encryptDataToFile(file.readAsBytesSync(), encryptedFile.path);
     return encryptedFile;
   }
 
-  File decryptFile(String directory, File file) {
+  Future<File> decryptFile(MapEntry<String, File> args) async {
+    String directory = args.key;
+    File file = args.value;
     String filename = file.path.split(Platform.pathSeparator).last;
     filename = filename.substring(0, filename.length - 4);
     File decryptedFile = File("$directory${Platform.pathSeparator}$filename");
-    crypt.decryptFileSync(file.path, decryptedFile.path);
+    await crypt.decryptFile(file.path, decryptedFile.path);
     return decryptedFile;
   }
 }
