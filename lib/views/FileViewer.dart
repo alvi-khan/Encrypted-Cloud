@@ -27,6 +27,7 @@ class _FileViewerState extends State<FileViewer> {
 
   void loadFiles() async {
     GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
+    await drive.setAuthHeaders(account.user!);
     if (drive.encryptionHandler.password == null) {
       String password = await showDialog(
           context: context,
@@ -34,7 +35,7 @@ class _FileViewerState extends State<FileViewer> {
       );
       drive.encryptionHandler.setPassword(password);
     }
-    await drive.getFiles(account.user!);
+    await drive.getFiles();
     setState(() => loading = false);
   }
 
@@ -52,7 +53,7 @@ class _FileViewerState extends State<FileViewer> {
       builder: (context, drive, child) {
 
         if (drive.newUploads && account.user != null) {
-          drive.getFiles(account.user!);
+          drive.getFiles();
         }
 
         if (drive.files.isEmpty) {

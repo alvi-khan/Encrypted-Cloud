@@ -27,13 +27,16 @@ class GoogleDrive extends ChangeNotifier{
   bool newUploads = false;
   var tempDir = Directory.systemTemp.createTempSync();
   EncryptionHandler encryptionHandler = EncryptionHandler();
+  late drive.DriveApi api;
+
+  Future<void> setAuthHeaders(GoogleSignInAccount user) async {
+    Map<String, String> authHeaders = await user.authHeaders;
+    AuthClient authClient = AuthClient(Client(), authHeaders);
+    api = drive.DriveApi(authClient);
+  }
 
   /// Create new root folder or retrieve existing one.
-  Future<String?> getRoot(GoogleSignInAccount account) async {
-    final client = Client();
-    var header = await account.authHeaders;
-    var authClient = AuthClient(client, header);
-    var api = drive.DriveApi(authClient);
+  Future<String?> getRoot() async {
     var response = await api.files.list(
         q: "name='Encrypted Cloud' and mimeType='application/vnd.google-apps.folder'",
         $fields: "files(id, trashed)"
@@ -54,17 +57,12 @@ class GoogleDrive extends ChangeNotifier{
     return file.id;
   }
 
-  void uploadFiles(GoogleSignInAccount user) async {
-    String? root = await getRoot(user);
+  void uploadFiles() async {
+    String? root = await getRoot();
     if (root == null) return; // TODO show error
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result == null) return;
-
-    final client = Client();
-    var header = await user.authHeaders;
-    var authClient = AuthClient(client, header);
-    var api = drive.DriveApi(authClient);
 
     List<String?> names = result.names;
     List<File> files = result.paths.map((path) => File(path!)).toList();
@@ -84,7 +82,7 @@ class GoogleDrive extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future<File?> downloadFile(drive.DriveApi api, drive.File driveFile) async {
+  Future<File?> downloadFile(drive.File driveFile) async {
     String filename = driveFile.name ?? DateTime.now().toString();
     File? file = File("${tempDir.path}${Platform.pathSeparator}$filename");
 
@@ -106,14 +104,9 @@ class GoogleDrive extends ChangeNotifier{
     return file;
   }
 
-  Future<void> getFiles(GoogleSignInAccount account) async {
-    String? root = await getRoot(account);
+  Future<void> getFiles() async {
+    String? root = await getRoot();
     if (root == null) return; // TODO display error
-
-    final client = Client();
-    var header = await account.authHeaders;
-    var authClient = AuthClient(client, header);
-    var api = drive.DriveApi(authClient);
 
     String? pageToken;
     List<drive.File> newFiles = [];
@@ -138,14 +131,14 @@ class GoogleDrive extends ChangeNotifier{
     fileStates = List.filled(newFiles.length, FileState.loading);
     newUploads = false;
     notifyListeners();
-    downloadFiles(newFiles, api);
+    downloadFiles(newFiles);
     return;
   }
 
-  void downloadFiles(List<drive.File> newFiles, drive.DriveApi api) async{
+  void downloadFiles(List<drive.File> newFiles) async{
     for (drive.File file in newFiles) {
       int index = newFiles.indexOf(file);
-      files[index] = await downloadFile(api, file);
+      files[index] = await downloadFile(file);
       fileStates[index] = files[index] == null ? FileState.error : FileState.available;
       notifyListeners();
     }
