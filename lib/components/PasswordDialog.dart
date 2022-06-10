@@ -45,5 +45,4 @@ class PasswordDialog extends StatelessWidget {
       actionsPadding: const EdgeInsets.symmetric(vertical: 30),
     );
   }
-
 }

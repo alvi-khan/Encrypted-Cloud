@@ -19,8 +19,8 @@ class _FullscreenState extends State<Fullscreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<File> files = Provider.of<GoogleDrive>(context, listen: false).files;
-    files = files.where((file) => validExtensions.any(file.path.endsWith)).toList();
+    List<File?> files = Provider.of<GoogleDrive>(context, listen: false).files;
+    files = files.where((file) => file != null && validExtensions.any(file.path.endsWith)).toList();
     PageController controller = PageController(initialPage: files.indexOf(widget.tappedFile));
 
     return PhotoViewGallery.builder(
@@ -30,7 +30,7 @@ class _FullscreenState extends State<Fullscreen> {
       pageController: controller,
       builder: (BuildContext context, int index) {
         return PhotoViewGalleryPageOptions(
-            imageProvider: FileImage(files[index]),
+            imageProvider: FileImage(files[index]!),
             minScale: PhotoViewComputedScale.contained,
         );
       },

@@ -40,7 +40,13 @@ class _FileViewerState extends State<FileViewer> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading)  return const LoadingIndicator();
+    if (loading) {
+      return const LoadingIndicator(
+        size: 200,
+        strokeWidth: 10,
+        color: Colors.blueGrey,
+      );
+    }
 
     return Consumer<GoogleDrive>(
       builder: (context, drive, child) {
@@ -81,7 +87,7 @@ class _FileViewerState extends State<FileViewer> {
                     ),
                     itemCount: drive.files.length,
                     itemBuilder: (context, index) {
-                      return FileCard(drive.files[index]);
+                      return FileCard(drive.files[index], drive.fileStates[index]);
                     }
                 ),
               ),
