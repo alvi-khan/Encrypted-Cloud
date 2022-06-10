@@ -25,6 +25,7 @@ class AuthClient extends BaseClient {
 class GoogleDrive extends ChangeNotifier{
   List<File?> files = [];
   List<FileState> fileStates = [];
+  bool uploading = false;
   bool newUploads = false;
   var tempDir = Directory.systemTemp.createTempSync();
   EncryptionHandler encryptionHandler = EncryptionHandler();
@@ -65,6 +66,9 @@ class GoogleDrive extends ChangeNotifier{
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result == null) return;
 
+    uploading = true;
+    notifyListeners();
+
     List<String?> names = result.names;
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
@@ -80,6 +84,7 @@ class GoogleDrive extends ChangeNotifier{
     }
 
     newUploads = true;
+    uploading = false;
     notifyListeners();
   }
 
