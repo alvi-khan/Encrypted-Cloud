@@ -6,6 +6,7 @@ import 'package:encrypted_cloud/components/FileCard.dart';
 import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:encrypted_cloud/components/UploadButton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class FileViewer extends StatefulWidget {
@@ -121,6 +122,7 @@ class _FileViewerState extends State<FileViewer> {
 
         return  Scaffold(
           appBar: AppBar(
+            systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
             backgroundColor: Colors.blueGrey.shade800,
             title: selections == 0 ?
             Text("Encrypted Cloud", style: TextStyle(color: Colors.blueGrey.shade100)) :
