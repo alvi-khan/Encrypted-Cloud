@@ -75,7 +75,7 @@ class GoogleDrive extends ChangeNotifier{
     for (var i = 0; i < files.length; i++) {
       String filename = names[i] ?? DateTime.now().toString();
       var driveFile = drive.File(name: "$filename.aes", parents: [root]);
-      File encryptedFile = await compute(encryptionHandler.encryptFile, MapEntry(tempDir.path, files[i]));
+      File encryptedFile = await compute(encryptionHandler.encryptFile, files[i]);
       final result = await api.files.create(
           driveFile,
           uploadMedia: drive.Media(encryptedFile.openRead(), encryptedFile.lengthSync())
@@ -101,7 +101,7 @@ class GoogleDrive extends ChangeNotifier{
     file.writeAsBytesSync(dataStore);
     if (filename.endsWith(".aes")) {
       try {
-        file = await compute(encryptionHandler.decryptFile, MapEntry(tempDir.path, file));
+        file = await compute(encryptionHandler.decryptFile, file);
       } catch(exception) {
         file = null;
         // TODO display error
