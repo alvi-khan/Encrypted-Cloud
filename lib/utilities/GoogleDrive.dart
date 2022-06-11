@@ -123,12 +123,14 @@ class GoogleDrive extends ChangeNotifier{
           pageToken: pageToken,
           supportsAllDrives: false,
           spaces: "drive",
-          $fields: "nextPageToken, files(id, name, mimeType, hasThumbnail, thumbnailLink)"
+          $fields: "nextPageToken, files(id, name, mimeType, trashed)"
       );
       pageToken = fileList.nextPageToken;
       if (fileList.files != null) {
         for (var driveFile in fileList.files!) {
-          if (driveFile.name == null || !driveFile.name!.endsWith(".aes"))  continue;
+          if (driveFile.name == null) continue;
+          if (!driveFile.name!.endsWith(".aes"))  continue;
+          if (driveFile.trashed!) continue;
           newFiles.add(driveFile);
         }}
     } while (pageToken != null);
