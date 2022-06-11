@@ -52,13 +52,21 @@ class _FileViewerState extends State<FileViewer> {
     }
   }
 
+  void clearSelections(List<DecryptedFile> files) {
+    for (var file in files) {file.selected = false;}
+    setState(() => selections = 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const LoadingIndicator(
-        size: 200,
-        strokeWidth: 10,
-        color: Colors.blueGrey,
+      return Scaffold(
+        backgroundColor: Colors.blueGrey.shade800,
+        body: const LoadingIndicator(
+          size: 200,
+          strokeWidth: 10,
+          color: Colors.blueGrey,
+        ),
       );
     }
 
@@ -70,49 +78,107 @@ class _FileViewerState extends State<FileViewer> {
         }
 
         if (drive.files.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 100),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Icon(Icons.image_rounded, size: 150, color: Colors.blueGrey.shade100),
-                const SizedBox(height: 20),
-                Text(
-                  "Images you upload will show up here.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.blueGrey.shade100, fontSize: 20, height: 1.5),
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.blueGrey.shade800,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: CircleAvatar(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.network(account.user!.photoUrl!),
+                      // TODO handle no profile image case
+                    ),
+                  ),
                 ),
               ],
+            ),
+            backgroundColor: Colors.blueGrey.shade800,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 100),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(Icons.image_rounded, size: 150, color: Colors.blueGrey.shade100),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Images you upload will show up here.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.blueGrey.shade100, fontSize: 20, height: 1.5),
+                  ),
+                ],
+              ),
             ),
           );
         }
 
-        return Stack(
-          children: [
-            SafeArea(
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 200,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                    ),
-                    itemCount: drive.files.length,
-                    itemBuilder: (context, index) {
-                      return FileCard(
-                        file: drive.files[index],
-                        selecting: selections != 0,
-                        toggleSelect: () => toggleSelect(drive.files[index]),
-                      );
-                    }
+        return  Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.blueGrey.shade800,
+            title: selections == 0 ?
+            Text("Encrypted Cloud", style: TextStyle(color: Colors.blueGrey.shade100)) :
+            Row(
+              children: [
+                GestureDetector(
+                    onTap: () => clearSelections(drive.files),
+                    child: Icon(Icons.clear_rounded, size: 30, color: Colors.blueGrey.shade100)
                 ),
-              ),
+                const SizedBox(width: 30),
+                Text(
+                    selections.toString(),
+                    style: TextStyle(color: Colors.blueGrey.shade100)
+                ),
+              ],
             ),
-            const UploadButton(),
-          ]
-        );
+            actions: [
+              if (selections == 0)
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.network(account.user!.photoUrl!),
+                        // TODO handle no profile image case
+                      )
+                  ),
+                ),
+              if (selections != 0)
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Icon(Icons.more_vert_rounded, size: 30, color: Colors.blueGrey.shade100),
+                ),
+            ],
+          ),
+          backgroundColor: Colors.blueGrey.shade800,
+          body: Stack(
+              children: [
+                SafeArea(
+                  child: Container(
+                    margin: const EdgeInsets.all(10),
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 200,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                      ),
+                      itemCount: drive.files.length,
+                      itemBuilder: (context, index) {
+                        return FileCard(
+                          file: drive.files[index],
+                          selecting: selections != 0,
+                          toggleSelect: () => toggleSelect(drive.files[index]),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const UploadButton(),
+              ]
+            ),
+          );
       },
     );
   }

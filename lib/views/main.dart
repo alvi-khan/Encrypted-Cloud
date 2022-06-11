@@ -42,10 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Consumer<GoogleAccount>(
       builder: (context, account, child) {
-        return Scaffold(
-          backgroundColor: Colors.blueGrey.shade800,
-          body: account.user == null ? const SignInPage() : const FileViewer()
-        );
+        return account.user == null ? const SignInPage() : const FileViewer();
       }
     );
   }

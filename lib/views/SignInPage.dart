@@ -12,21 +12,24 @@ class SignInPage extends StatefulWidget {
 class _SignInPage extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<GoogleAccount> (
-        builder: (context, account, child) {
-          return Center(
-            child: ElevatedButton(
-              onPressed: () => account.signIn(),
-              style: ElevatedButton.styleFrom(
-                  textStyle: const TextStyle(fontSize: 20),
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  primary: Colors.blueGrey.shade400,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+    return Scaffold(
+      backgroundColor: Colors.blueGrey.shade800,
+      body: Consumer<GoogleAccount> (
+          builder: (context, account, child) {
+            return Center(
+              child: ElevatedButton(
+                onPressed: () => account.signIn(),
+                style: ElevatedButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                    primary: Colors.blueGrey.shade400,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                ),
+                child: const Text("Sign In"),
               ),
-              child: const Text("Sign In"),
-            ),
-          );
-        }
+            );
+          }
+      ),
     );
   }
 }
