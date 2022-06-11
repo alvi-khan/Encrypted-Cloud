@@ -57,6 +57,11 @@ class _FileViewerState extends State<FileViewer> {
     setState(() => selections = 0);
   }
 
+  void selectAll(List<DecryptedFile> files) {
+    for (var file in files) {file.selected = true;}
+    setState(() => selections = files.length);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -167,7 +172,7 @@ class _FileViewerState extends State<FileViewer> {
                           )
                       );
                       PopupMenuItem selectAllButton = PopupMenuItem(
-                          onTap: () => {},  // TODO implement all file selection
+                          onTap: () => selectAll(drive.files),
                           enabled: selections != drive.files.length,
                           textStyle: const TextStyle(color: Colors.white),
                           child: Row(
