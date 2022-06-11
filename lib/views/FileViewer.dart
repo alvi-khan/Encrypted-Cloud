@@ -148,7 +148,51 @@ class _FileViewerState extends State<FileViewer> {
               if (selections != 0)
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: Icon(Icons.more_vert_rounded, size: 30, color: Colors.blueGrey.shade100),
+                  child: PopupMenuButton(
+                    icon: Icon(Icons.more_vert_rounded, size: 30, color: Colors.blueGrey.shade100),
+                    color: Colors.blueGrey.shade500,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    splashRadius: null,
+                    itemBuilder: (context) {
+                      PopupMenuItem saveButton = PopupMenuItem(
+                          onTap: () => {},  // TODO implement file saving
+                          enabled: selections != 0,
+                          textStyle: const TextStyle(color: Colors.white),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.save_alt_rounded),
+                              SizedBox(width: 10),
+                              Text("Download"),
+                            ],
+                          )
+                      );
+                      PopupMenuItem selectAllButton = PopupMenuItem(
+                          onTap: () => {},  // TODO implement all file selection
+                          enabled: selections != drive.files.length,
+                          textStyle: const TextStyle(color: Colors.white),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.check_rounded),
+                              SizedBox(width: 10),
+                              Text("Select All"),
+                            ],
+                          )
+                      );
+                      PopupMenuItem deleteButton = PopupMenuItem(
+                          onTap: () => {},  // TODO implement file deletion
+                          enabled: selections != 0,
+                          textStyle: const TextStyle(color: Colors.white),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.delete_rounded),
+                              SizedBox(width: 10),
+                              Text("Delete"),
+                            ],
+                          )
+                      );
+                      return List.from([saveButton, selectAllButton, deleteButton]);
+                    },
+                  ),
                 ),
             ],
           ),
