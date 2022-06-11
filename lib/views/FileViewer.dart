@@ -16,6 +16,8 @@ class FileViewer extends StatefulWidget {
 
 class _FileViewerState extends State<FileViewer> {
   bool loading = true;
+  bool selecting = false;
+  List<int> selected = [];
   late GoogleAccount account;
 
   @override
@@ -37,6 +39,13 @@ class _FileViewerState extends State<FileViewer> {
     }
     await drive.getFiles();
     setState(() => loading = false);
+  }
+
+  void toggleSelect(int index) {
+    if (!selecting) selecting = true;
+    selected.contains(index) ? selected.remove(index) : selected.add(index);
+    if (selected.isEmpty) selecting = false;
+    setState(() {});
   }
 
   @override
@@ -88,7 +97,13 @@ class _FileViewerState extends State<FileViewer> {
                     ),
                     itemCount: drive.files.length,
                     itemBuilder: (context, index) {
-                      return FileCard(drive.files[index], drive.fileStates[index]);
+                      return FileCard(
+                        file: drive.files[index],
+                        fileState: drive.fileStates[index],
+                        selecting: selecting,
+                        selected: selected.contains(index),
+                        toggleSelect: () => toggleSelect(index),
+                      );
                     }
                 ),
               ),

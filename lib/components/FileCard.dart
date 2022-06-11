@@ -7,9 +7,20 @@ import 'package:encrypted_cloud/views/Fullscreen.dart';
 import 'package:flutter/material.dart';
 
 class FileCard extends StatelessWidget {
-  const FileCard(this.file, this.fileState, {Key? key}) : super(key: key);
+  const FileCard({
+    Key? key,
+    required this.file,
+    required this.fileState,
+    required this.selecting,
+    required this.selected,
+    required this.toggleSelect
+  }) : super(key: key);
+
   final File? file;
   final FileState fileState;
+  final bool selecting;
+  final bool selected;
+  final Function toggleSelect;
   final List<String> validExtensions = const [".png", ".jpg"];
 
   @override
@@ -37,8 +48,9 @@ class FileCard extends StatelessWidget {
       filename = file!.path.split(Platform.pathSeparator).last;
       if (!validExtensions.any(filename.endsWith)) {
         child = null;
-      } else {
+      } else if (!selecting) {
         child = GestureDetector(
+            onLongPress: () => toggleSelect(),
             onTap: () {
               Navigator.push(
                 context,
@@ -47,13 +59,37 @@ class FileCard extends StatelessWidget {
             },
             child: Image.file(file!, fit: BoxFit.cover)
         );
+      } else {
+        child = GestureDetector(
+          onTap: () => toggleSelect(),
+          child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(file!, fit: BoxFit.cover),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(5.0),
+                  alignment: Alignment.topLeft,
+                  child: Icon(
+                    selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                    color: Colors.blueGrey.shade100,
+                  ),
+                ),
+              ]
+          ),
+        );
       }
     }
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
-        footer: filename == "" ? null : FileCardFooter(text: filename),
+        footer: filename == "" || selecting ? null : FileCardFooter(text: filename),
         child: Container(
           decoration: BoxDecoration(
               color: Colors.blueGrey,
