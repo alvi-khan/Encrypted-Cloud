@@ -1,6 +1,7 @@
 import 'package:encrypted_cloud/components/PasswordDialog.dart';
-import 'package:encrypted_cloud/utilities/GoogleAccount.dart';
-import 'package:encrypted_cloud/utilities/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/DecryptedFile.dart';
+import 'package:encrypted_cloud/utils/GoogleAccount.dart';
+import 'package:encrypted_cloud/utils/GoogleDrive.dart';
 import 'package:encrypted_cloud/components/FileCard.dart';
 import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:encrypted_cloud/components/UploadButton.dart';
@@ -16,8 +17,7 @@ class FileViewer extends StatefulWidget {
 
 class _FileViewerState extends State<FileViewer> {
   bool loading = true;
-  bool selecting = false;
-  List<int> selected = [];
+  int selections = 0;
   late GoogleAccount account;
 
   @override
@@ -41,11 +41,15 @@ class _FileViewerState extends State<FileViewer> {
     setState(() => loading = false);
   }
 
-  void toggleSelect(int index) {
-    if (!selecting) selecting = true;
-    selected.contains(index) ? selected.remove(index) : selected.add(index);
-    if (selected.isEmpty) selecting = false;
-    setState(() {});
+  void toggleSelect(DecryptedFile file) {
+    bool selected = file.selected;
+    if (selected) {
+      file.selected = false;
+      setState(() => selections--);
+    } else {
+      file.selected = true;
+      setState(() => selections++);
+    }
   }
 
   @override
@@ -99,10 +103,8 @@ class _FileViewerState extends State<FileViewer> {
                     itemBuilder: (context, index) {
                       return FileCard(
                         file: drive.files[index],
-                        fileState: drive.fileStates[index],
-                        selecting: selecting,
-                        selected: selected.contains(index),
-                        toggleSelect: () => toggleSelect(index),
+                        selecting: selections != 0,
+                        toggleSelect: () => toggleSelect(drive.files[index]),
                       );
                     }
                 ),

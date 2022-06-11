@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:encrypted_cloud/enums/FileState.dart';
-import 'package:encrypted_cloud/utilities/EncryptionHandler.dart';
+import 'package:encrypted_cloud/utils/EncryptionHandler.dart';
+import 'package:encrypted_cloud/utils/DecryptedFile.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,7 @@ class AuthClient extends BaseClient {
 }
 
 class GoogleDrive extends ChangeNotifier{
-  List<File?> files = [];
-  List<FileState> fileStates = [];
+  List<DecryptedFile> files = [];
   bool uploading = false;
   bool newUploads = false;
   var tempDir = Directory.systemTemp.createTempSync();
@@ -135,8 +135,7 @@ class GoogleDrive extends ChangeNotifier{
         }}
     } while (pageToken != null);
 
-    files = List.filled(newFiles.length, null);
-    fileStates = List.filled(newFiles.length, FileState.loading);
+    files = List.generate(newFiles.length, (index) => DecryptedFile(data: null));
     newUploads = false;
     notifyListeners();
     downloadFiles(newFiles);
@@ -146,8 +145,9 @@ class GoogleDrive extends ChangeNotifier{
   void downloadFiles(List<drive.File> newFiles) async{
     for (drive.File file in newFiles) {
       int index = newFiles.indexOf(file);
-      files[index] = await downloadFile(file);
-      fileStates[index] = files[index] == null ? FileState.error : FileState.available;
+      File? data = await downloadFile(file);
+      files[index].data = data;
+      files[index].state = data == null ? FileState.error : FileState.available;
       notifyListeners();
     }
   }

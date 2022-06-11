@@ -1,5 +1,5 @@
 import 'package:encrypted_cloud/components/LoadingIndicator.dart';
-import 'package:encrypted_cloud/utilities/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/GoogleDrive.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

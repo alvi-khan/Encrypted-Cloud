@@ -1,4 +1,4 @@
-import 'package:encrypted_cloud/utilities/GoogleAccount.dart';
+import 'package:encrypted_cloud/utils/GoogleAccount.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -3,23 +3,17 @@ import 'dart:io';
 import 'package:encrypted_cloud/components/FileCardFooter.dart';
 import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:encrypted_cloud/enums/FileState.dart';
+import 'package:encrypted_cloud/utils/DecryptedFile.dart';
 import 'package:encrypted_cloud/views/Fullscreen.dart';
 import 'package:flutter/material.dart';
 
 class FileCard extends StatelessWidget {
   const FileCard({
     Key? key,
-    required this.file,
-    required this.fileState,
-    required this.selecting,
-    required this.selected,
-    required this.toggleSelect
-  }) : super(key: key);
+    required this.file, required this.selecting, required this.toggleSelect}) : super(key: key);
 
-  final File? file;
-  final FileState fileState;
+  final DecryptedFile file;
   final bool selecting;
-  final bool selected;
   final Function toggleSelect;
   final List<String> validExtensions = const [".png", ".jpg"];
 
@@ -28,7 +22,7 @@ class FileCard extends StatelessWidget {
     String filename = "";
     Widget? child;
 
-    if (fileState == FileState.loading) {
+    if (file.state == FileState.loading) {
       child = LoadingIndicator(
         size: 100,
         strokeWidth: 7,
@@ -36,7 +30,7 @@ class FileCard extends StatelessWidget {
       );
     }
 
-    if (fileState == FileState.error) {
+    if (file.state == FileState.error) {
       child = Icon(
           Icons.error_outline_rounded,
           size: 100,
@@ -44,8 +38,8 @@ class FileCard extends StatelessWidget {
       );
     }
 
-    if (fileState == FileState.available) {
-      filename = file!.path.split(Platform.pathSeparator).last;
+    if (file.state == FileState.available) {
+      filename = file.data!.path.split(Platform.pathSeparator).last;
       if (!validExtensions.any(filename.endsWith)) {
         child = null;
       } else if (!selecting) {
@@ -54,10 +48,10 @@ class FileCard extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Fullscreen(tappedFile: file!)),
+                MaterialPageRoute(builder: (context) => Fullscreen(tappedFile: file)),
               );
             },
-            child: Image.file(file!, fit: BoxFit.cover)
+            child: Image.file(file.data!, fit: BoxFit.cover)
         );
       } else {
         child = GestureDetector(
@@ -69,14 +63,14 @@ class FileCard extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.file(file!, fit: BoxFit.cover),
+                      child: Image.file(file.data!, fit: BoxFit.cover),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(5.0),
                   alignment: Alignment.topLeft,
                   child: Icon(
-                    selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                    file.selected ? Icons.check_circle_rounded : Icons.circle_outlined,
                     color: Colors.blueGrey.shade100,
                   ),
                 ),
