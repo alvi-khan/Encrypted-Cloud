@@ -51,6 +51,27 @@ class FileCard extends StatelessWidget {
             },
             child: Image.file(file.data!, fit: BoxFit.cover)
         );
+      } else if (!file.selected) {
+        child = GestureDetector(
+          onTap: () => toggleSelect(),
+          child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(file.data!, fit: BoxFit.cover),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(5.0),
+                  alignment: Alignment.topLeft,
+                  child: Icon(
+                    file.selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                    color: Colors.blueGrey.shade100,
+                  ),
+                ),
+              ]
+          ),
+        );
       } else {
         child = GestureDetector(
           onTap: () => toggleSelect(),
@@ -60,8 +81,8 @@ class FileCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.file(file.data!, fit: BoxFit.cover),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(file.data!, fit: BoxFit.cover),
                   ),
                 ),
                 Container(
