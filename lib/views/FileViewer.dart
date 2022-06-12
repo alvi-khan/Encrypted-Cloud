@@ -32,10 +32,14 @@ class _FileViewerState extends State<FileViewer> {
     GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
     await drive.setAuthHeaders(account.user!);
     if (drive.encryptionHandler.password == null) {
-      String password = await showDialog(
+      String? password = await showDialog(
           context: context,
           builder: (context) => PasswordDialog()
       );
+      if (password == null) {
+        account.signOut();
+        return;
+      }
       drive.encryptionHandler.setPassword(password);
     }
     await drive.getFiles();
