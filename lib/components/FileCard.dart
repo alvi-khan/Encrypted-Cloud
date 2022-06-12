@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:encrypted_cloud/components/FileCardFooter.dart';
 import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:encrypted_cloud/enums/FileState.dart';
@@ -39,7 +37,7 @@ class FileCard extends StatelessWidget {
     }
 
     if (file.state == FileState.available) {
-      filename = file.data!.path.split(Platform.pathSeparator).last;
+      filename = file.getFileName()!;
       if (!validExtensions.any(filename.endsWith)) {
         child = null;
       } else if (!selecting) {

@@ -67,6 +67,11 @@ class _FileViewerState extends State<FileViewer> {
     setState(() => selections = files.length);
   }
 
+  void saveLocally(List<DecryptedFile> files) {
+    files.where((file) => file.selected == true)
+        .forEach((file) => file.saveLocally());
+  }
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -160,7 +165,7 @@ class _FileViewerState extends State<FileViewer> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     splashRadius: null,
                     itemBuilder: (context) {
-                      PopupMenuItem deleteButton = PopupMenuItem(
+                      PopupMenuItem logoutButton = PopupMenuItem(
                           onTap: () => account.signOut(),
                           textStyle: const TextStyle(color: Colors.white),
                           child: Row(
@@ -171,7 +176,7 @@ class _FileViewerState extends State<FileViewer> {
                             ],
                           )
                       );
-                      return List.from([deleteButton]);
+                      return List.from([logoutButton]);
                     },
                   ),
                 ),
@@ -185,7 +190,7 @@ class _FileViewerState extends State<FileViewer> {
                     splashRadius: null,
                     itemBuilder: (context) {
                       PopupMenuItem saveButton = PopupMenuItem(
-                          onTap: () => {},  // TODO implement file saving
+                          onTap: () => saveLocally(drive.files),
                           enabled: selections != 0,
                           textStyle: const TextStyle(color: Colors.white),
                           child: Row(

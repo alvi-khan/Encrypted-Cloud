@@ -18,6 +18,7 @@ dependencies:
   file_picker: ^4.6.0
   aes_crypt_null_safe: ^2.0.2
   photo_view: ^0.14.0
+  permission_handler: ^9.2.0
 
 dev_dependencies:
   flutter_test:
