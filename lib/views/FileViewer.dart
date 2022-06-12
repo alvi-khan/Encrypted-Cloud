@@ -104,11 +104,6 @@ class _FileViewerState extends State<FileViewer> {
 
     return Consumer<GoogleDrive>(
       builder: (context, drive, child) {
-
-        if (drive.newUploads && account.user != null) {
-          drive.getFiles();
-        }
-
         if (drive.files.isEmpty) {
           return Scaffold(
             appBar: AppBar(

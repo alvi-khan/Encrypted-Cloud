@@ -26,7 +26,6 @@ class AuthClient extends BaseClient {
 class GoogleDrive extends ChangeNotifier{
   List<DecryptedFile> files = [];
   bool uploading = false;
-  bool newUploads = false;
   var tempDir = Directory.systemTemp.createTempSync();
   EncryptionHandler encryptionHandler = EncryptionHandler();
   late drive.DriveApi api;
@@ -76,15 +75,27 @@ class GoogleDrive extends ChangeNotifier{
       String filename = names[i] ?? DateTime.now().toString();
       var driveFile = drive.File(name: "$filename.aes", parents: [root]);
       File encryptedFile = await compute(encryptionHandler.encryptFile, files[i]);
-      final result = await api.files.create(
+      drive.File result = await api.files.create(
           driveFile,
           uploadMedia: drive.Media(encryptedFile.openRead(), encryptedFile.lengthSync())
       );
+      addFile(result);
       // TODO show error
     }
 
-    newUploads = true;
     uploading = false;
+    notifyListeners();
+  }
+
+  void addFile(drive.File driveFile) async {
+    DecryptedFile file = DecryptedFile(data: null);
+    file.id = driveFile.id!;
+    files.insert(0, file);
+    notifyListeners();
+
+    File? data = await downloadFile(driveFile);
+    file.data = data;
+    file.state = data == null ? FileState.error : FileState.available;
     notifyListeners();
   }
 
@@ -136,7 +147,6 @@ class GoogleDrive extends ChangeNotifier{
     } while (pageToken != null);
 
     files = List.generate(newFiles.length, (index) => DecryptedFile(data: null));
-    newUploads = false;
     notifyListeners();
     downloadFiles(newFiles);
     return;
