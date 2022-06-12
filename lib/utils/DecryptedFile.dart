@@ -4,11 +4,12 @@ import 'package:encrypted_cloud/enums/FileState.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DecryptedFile {
+  String id;
   File? data;
   FileState state;
   bool selected;
 
-  DecryptedFile({required this.data, this.state = FileState.loading, this.selected = false});
+  DecryptedFile({required this.data, this.id = "", this.state = FileState.loading, this.selected = false});
 
   String? getFileName() {
     if (data == null)  return null;

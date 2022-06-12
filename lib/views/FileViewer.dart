@@ -1,3 +1,4 @@
+import 'package:encrypted_cloud/components/DeleteFileConfirmationDialog.dart';
 import 'package:encrypted_cloud/components/PasswordDialog.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
 import 'package:encrypted_cloud/utils/GoogleAccount.dart';
@@ -68,8 +69,24 @@ class _FileViewerState extends State<FileViewer> {
   }
 
   void saveLocally(List<DecryptedFile> files) {
-    files.where((file) => file.selected == true)
+    files.where((file) => file.selected)
         .forEach((file) => file.saveLocally());
+    clearSelections(files);
+  }
+
+  void deleteFiles(List<DecryptedFile> files) async {
+    List<DecryptedFile> selectedFiles = files.where((file) => file.selected).toList();
+    await Future.delayed(Duration.zero, () => {});
+    bool? confirmed = await showDialog(
+        context: context,
+        builder: (context) => DeleteFileConfirmationDialog(fileCount: selectedFiles.length),
+    );
+    clearSelections(files);
+    if (confirmed == null || !confirmed)  return;
+    GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
+    for (DecryptedFile file in selectedFiles) {
+      drive.deleteFile(file);
+    }
   }
 
   @override
@@ -214,7 +231,7 @@ class _FileViewerState extends State<FileViewer> {
                           )
                       );
                       PopupMenuItem deleteButton = PopupMenuItem(
-                          onTap: () => {},  // TODO implement file deletion
+                          onTap: () => deleteFiles(drive.files),
                           enabled: selections != 0,
                           textStyle: const TextStyle(color: Colors.white),
                           child: Row(

@@ -146,9 +146,17 @@ class GoogleDrive extends ChangeNotifier{
     for (drive.File file in newFiles) {
       int index = newFiles.indexOf(file);
       File? data = await downloadFile(file);
+      files[index].id = file.id!;
       files[index].data = data;
       files[index].state = data == null ? FileState.error : FileState.available;
       notifyListeners();
     }
+  }
+
+  void deleteFile(DecryptedFile file) async {
+    if (file.id == "")  return;
+    api.files.delete(file.id);
+    files.remove(file);
+    notifyListeners();
   }
 }
