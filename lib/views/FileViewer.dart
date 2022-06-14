@@ -1,5 +1,6 @@
 import 'package:encrypted_cloud/components/DeleteFileConfirmationDialog.dart';
 import 'package:encrypted_cloud/components/PasswordDialog.dart';
+import 'package:encrypted_cloud/components/Refresh.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
 import 'package:encrypted_cloud/utils/GoogleAccount.dart';
 import 'package:encrypted_cloud/utils/GoogleDrive.dart';
@@ -249,20 +250,29 @@ class _FileViewerState extends State<FileViewer> {
                 SafeArea(
                   child: Container(
                     margin: const EdgeInsets.all(10),
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 200,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
+                    child: Refresh(
+                      onRefresh: () => loadFiles(),
+                      child: NotificationListener<OverscrollIndicatorNotification>(
+                        onNotification: (OverscrollIndicatorNotification overscroll) {
+                          overscroll.disallowIndicator();
+                          return false;
+                        },
+                        child: GridView.builder(
+                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                          ),
+                          itemCount: drive.files.length,
+                          itemBuilder: (context, index) {
+                            return FileCard(
+                              file: drive.files[index],
+                              selecting: selections != 0,
+                              toggleSelect: () => toggleSelect(drive.files[index]),
+                            );
+                          },
+                        ),
                       ),
-                      itemCount: drive.files.length,
-                      itemBuilder: (context, index) {
-                        return FileCard(
-                          file: drive.files[index],
-                          selecting: selections != 0,
-                          toggleSelect: () => toggleSelect(drive.files[index]),
-                        );
-                      },
                     ),
                   ),
                 ),

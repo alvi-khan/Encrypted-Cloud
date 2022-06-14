@@ -148,6 +148,9 @@ class GoogleDrive extends ChangeNotifier{
 
     files = List.generate(newFiles.length, (index) => DecryptedFile(data: null));
     notifyListeners();
+
+    tempDir.delete(recursive: true);
+    tempDir = Directory.systemTemp.createTempSync();
     downloadFiles(newFiles);
     return;
   }
