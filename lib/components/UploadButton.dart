@@ -9,13 +9,6 @@ class UploadButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GoogleDrive drive = Provider.of<GoogleDrive>(context);
-    late Widget child;
-
-    if (!drive.uploading) {
-      child = const Icon(Icons.upload_rounded, size: 50);
-    } else {
-      child = LoadingIndicator(size: 30, strokeWidth: 5, color: Colors.blueGrey.shade200);
-    }
 
     return Align(
       alignment: Alignment.bottomRight,
@@ -26,7 +19,11 @@ class UploadButton extends StatelessWidget {
         child: FloatingActionButton(
           onPressed: drive.uploading ? () {} : () => drive.uploadFiles(),
           backgroundColor: Colors.blueGrey.shade400,
-          child: child,
+          child: drive.uploading ? LoadingIndicator(
+              size: 30,
+              strokeWidth: 5,
+              color: Colors.blueGrey.shade200
+          ) : const Icon(Icons.upload_rounded, size: 50),
         ),
       ),
     );

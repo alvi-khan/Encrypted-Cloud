@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:encrypted_cloud/components/dialog/PasswordDialog.dart';
 import 'package:encrypted_cloud/enums/FileState.dart';
 import 'package:encrypted_cloud/utils/EncryptionHandler.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
@@ -25,15 +26,38 @@ class AuthClient extends BaseClient {
 
 class GoogleDrive extends ChangeNotifier{
   List<DecryptedFile> files = [];
+  int selections = 0;
   bool uploading = false;
   var tempDir = Directory.systemTemp.createTempSync();
   EncryptionHandler encryptionHandler = EncryptionHandler();
   late drive.DriveApi api;
 
+  Future<bool> init(BuildContext context, GoogleSignInAccount user) async {
+    await setAuthHeaders(user);
+    bool havePassword = await getPassword(context);
+    if (!havePassword)  return false;
+    await getFiles();
+    return true;
+  }
+
   Future<void> setAuthHeaders(GoogleSignInAccount user) async {
     Map<String, String> authHeaders = await user.authHeaders;
     AuthClient authClient = AuthClient(Client(), authHeaders);
     api = drive.DriveApi(authClient);
+  }
+
+  Future<bool> getPassword(BuildContext context) async {
+    if (encryptionHandler.password == null) {
+      String? password = await showDialog(
+          context: context,
+          builder: (context) => const PasswordDialog()
+      );
+      if (password == null) {
+        return false;
+      }
+      encryptionHandler.setPassword(password);
+    }
+    return true;
   }
 
   /// Create new root folder or retrieve existing one.
@@ -166,10 +190,38 @@ class GoogleDrive extends ChangeNotifier{
     }
   }
 
-  void deleteFile(DecryptedFile file) async {
-    if (file.id == "")  return;
-    api.files.delete(file.id);
-    files.remove(file);
+  void deleteSelections() async {
+    List<DecryptedFile> selections = files.where((file) => file.selected).toList();
+    for (DecryptedFile file in selections) {
+      api.files.delete(file.id);
+      files.remove(file);
+    }
+  }
+
+  void setSelected(int index, bool selected) {
+    files[index].selected = selected;
+    selections = selected ? selections + 1 : selections - 1;
     notifyListeners();
+  }
+
+  void clearSelections() {
+    for (DecryptedFile file in files) {
+      file.selected = false;
+    }
+    selections = 0;
+    notifyListeners();
+  }
+
+  void selectAll() {
+    for (DecryptedFile file in files) {
+      file.selected = true;
+    }
+    selections = files.length;
+    notifyListeners();
+  }
+
+  void saveLocally() {
+    files.where((file) => file.selected)
+        .forEach((file) => file.saveLocally());
   }
 }
