@@ -190,11 +190,19 @@ class GoogleDrive extends ChangeNotifier{
     }
   }
 
+  void deleteFile(DecryptedFile file) {
+    api.files.delete(file.id);
+    files.remove(file);
+    file.data!.deleteSync();
+    notifyListeners();
+  }
+
   void deleteSelections() async {
     List<DecryptedFile> selections = files.where((file) => file.selected).toList();
     for (DecryptedFile file in selections) {
       api.files.delete(file.id);
       files.remove(file);
+      file.data!.deleteSync();
     }
   }
 

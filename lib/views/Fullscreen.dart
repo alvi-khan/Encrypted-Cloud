@@ -1,3 +1,4 @@
+import 'package:encrypted_cloud/components/FullscreenOptions.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
 import 'package:encrypted_cloud/utils/GoogleDrive.dart';
 import 'package:flutter/material.dart';
@@ -15,24 +16,70 @@ class Fullscreen extends StatefulWidget {
 
 class _FullscreenState extends State<Fullscreen> {
   final List<String> validExtensions = const [".png", ".jpg"];
+  bool optionsVisible = true;
+  late DecryptedFile currentFile;
+
+  @override
+  void initState() {
+    currentFile = widget.tappedFile;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<DecryptedFile> files = Provider.of<GoogleDrive>(context, listen: false).files;
-    files = files.where((file) => file.data != null && validExtensions.any(file.data!.path.endsWith)).toList();
-    PageController controller = PageController(initialPage: files.indexOf(widget.tappedFile));
+    GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
+    List<DecryptedFile> validFiles = drive.files.where((file) {
+      return file.data != null && validExtensions.any(file.data!.path.endsWith);
+    }).toList();
+    PageController controller = PageController(initialPage: validFiles.indexOf(currentFile));
 
-    return PhotoViewGallery.builder(
-      enableRotation: false,
-      scrollPhysics: const BouncingScrollPhysics(),
-      itemCount: files.length,
-      pageController: controller,
-      builder: (BuildContext context, int index) {
-        return PhotoViewGalleryPageOptions(
-            imageProvider: FileImage(files[index].data!),
-            minScale: PhotoViewComputedScale.contained,
-        );
-      },
+    // TODO hide status bar once flutter/flutter#95403 is resolved
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() => optionsVisible = !optionsVisible);
+            },
+            child: Container(
+              color: Colors.black,
+              child: PhotoViewGallery.builder(
+                onPageChanged: (index) {
+                  setState(() => currentFile = validFiles[index]);
+                },
+                enableRotation: false,
+                scrollPhysics: const BouncingScrollPhysics(),
+                itemCount: validFiles.length,
+                pageController: controller,
+                builder: (BuildContext context, int index) {
+                  return PhotoViewGalleryPageOptions(
+                    imageProvider: FileImage(validFiles[index].data!),
+                    initialScale: PhotoViewComputedScale.contained * 0.999,
+                    minScale: PhotoViewComputedScale.contained * 0.999,
+                    // TODO remove * 0.999 once bluefireteam/photo_view#383 is resolved
+                  );
+                },
+              ),
+            ),
+          ),
+          FullscreenOptions(
+            optionsVisible: optionsVisible,
+            onSave: () => currentFile.saveLocally(),
+            onDelete: () {
+              DecryptedFile oldFile = currentFile;
+              int index = validFiles.indexOf(currentFile);
+              index = index + 1 == validFiles.length ? index - 1 : index + 1;
+              drive.deleteFile(oldFile);
+              if (validFiles.length != 1) {
+                setState(() => currentFile = validFiles[index]);
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
