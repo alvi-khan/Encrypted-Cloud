@@ -49,36 +49,47 @@ class _FileViewerState extends State<FileViewer> {
           return const NoResultsPage();
         }
 
-        return  Scaffold(
-          appBar: const BasicAppBar(),
-          backgroundColor: Colors.blueGrey.shade800,
-          body: Stack(
-              children: [
-                SafeArea(
-                  child: Container(
-                    margin: const EdgeInsets.all(10),
-                    child: Refresh(
-                      onRefresh: () => loadFiles(),
-                      child: NoOverscrollGlow(
-                        child: GridView.builder(
-                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
+        return  WillPopScope(
+          onWillPop: () async {
+            if (drive.selections == 0) {
+              return true;
+            }
+            else {
+              drive.clearSelections();
+              return false;
+            }
+          },
+          child: Scaffold(
+            appBar: const BasicAppBar(),
+            backgroundColor: Colors.blueGrey.shade800,
+            body: Stack(
+                children: [
+                  SafeArea(
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      child: Refresh(
+                        onRefresh: () => loadFiles(),
+                        child: NoOverscrollGlow(
+                          child: GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 200,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                            ),
+                            itemCount: drive.files.length,
+                            itemBuilder: (context, index) {
+                              return FileCard(drive.files[index]);
+                            },
                           ),
-                          itemCount: drive.files.length,
-                          itemBuilder: (context, index) {
-                            return FileCard(drive.files[index]);
-                          },
                         ),
                       ),
                     ),
                   ),
-                ),
-                const UploadButton(),
-              ]
+                  const UploadButton(),
+                ]
+              ),
             ),
-          );
+        );
       },
     );
   }
