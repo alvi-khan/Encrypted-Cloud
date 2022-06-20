@@ -8,17 +8,23 @@ class ProfileMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GoogleAccount account = Provider.of<GoogleAccount>(context, listen: false);
+    String? image = account.user!.photoUrl;
+    Widget icon;
+    if (image == null) {
+      icon = Icon(Icons.more_vert_rounded, size: 30, color: Colors.blueGrey.shade100);
+    } else {
+      icon = CircleAvatar(
+          backgroundColor: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: Image.network(account.user!.photoUrl!)
+          ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: PopupMenuButton(
-        icon: CircleAvatar(
-            backgroundColor: Colors.transparent,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: Image.network(account.user!.photoUrl!),
-              // TODO handle no profile image case
-            )
-        ),
+        icon: icon,
         color: Colors.blueGrey.shade500,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         splashRadius: null,
