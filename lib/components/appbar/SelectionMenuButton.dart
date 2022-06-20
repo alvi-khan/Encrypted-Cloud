@@ -1,27 +1,27 @@
 import 'package:encrypted_cloud/components/dialog/DeleteFileConfirmationDialog.dart';
-import 'package:encrypted_cloud/utils/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SelectionMenuButton extends StatelessWidget {
   const SelectionMenuButton({Key? key}) : super(key: key);
 
-  void deleteFiles(BuildContext context, GoogleDrive drive) async {
+  void deleteFiles(BuildContext context, FileHandler fileHandler) async {
     await Future.delayed(Duration.zero, () => {});
     bool? confirmed = await showDialog(
       context: context,
-      builder: (context) => DeleteFileConfirmationDialog(fileCount: drive.selections),
+      builder: (context) => DeleteFileConfirmationDialog(fileCount: fileHandler.selections),
     );
 
-    if (confirmed != null && confirmed) drive.deleteSelections();
-    drive.clearSelections();
+    if (confirmed != null && confirmed) fileHandler.deleteSelections();
+    fileHandler.clearSelections();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GoogleDrive>(
-      builder: (context, drive, child) {
-        int selections = drive.files.where((file) => file.selected).length;
+    return Consumer<FileHandler>(
+      builder: (context, fileHandler, child) {
+        int selections = fileHandler.files.where((file) => file.selected).length;
         return Padding(
           padding: const EdgeInsets.only(right: 10),
           child: PopupMenuButton(
@@ -32,8 +32,8 @@ class SelectionMenuButton extends StatelessWidget {
             itemBuilder: (context) {
               PopupMenuItem saveButton = PopupMenuItem(
                   onTap: () {
-                    drive.saveLocally();
-                    drive.clearSelections();
+                    fileHandler.saveLocally();
+                    fileHandler.clearSelections();
                   },
                   enabled: selections != 0,
                   textStyle: const TextStyle(color: Colors.white),
@@ -46,8 +46,8 @@ class SelectionMenuButton extends StatelessWidget {
                   )
               );
               PopupMenuItem selectAllButton = PopupMenuItem(
-                  onTap: () => drive.selectAll(),
-                  enabled: selections != drive.files.length,
+                  onTap: () => fileHandler.selectAll(),
+                  enabled: selections != fileHandler.files.length,
                   textStyle: const TextStyle(color: Colors.white),
                   child: Row(
                     children: const [
@@ -58,7 +58,7 @@ class SelectionMenuButton extends StatelessWidget {
                   )
               );
               PopupMenuItem deleteButton = PopupMenuItem(
-                  onTap: () => deleteFiles(context, drive),
+                  onTap: () => deleteFiles(context, fileHandler),
                   enabled: selections != 0,
                   textStyle: const TextStyle(color: Colors.white),
                   child: Row(

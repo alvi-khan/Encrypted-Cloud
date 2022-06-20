@@ -3,7 +3,7 @@ import 'package:encrypted_cloud/components/appbar/BasicAppBar.dart';
 import 'package:encrypted_cloud/views/NoResultsPage.dart';
 import 'package:encrypted_cloud/components/Refresh.dart';
 import 'package:encrypted_cloud/utils/GoogleAccount.dart';
-import 'package:encrypted_cloud/utils/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:encrypted_cloud/components/filecard/FileCard.dart';
 import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:encrypted_cloud/components/UploadButton.dart';
@@ -29,8 +29,8 @@ class _FileViewerState extends State<FileViewer> {
   }
 
   void loadFiles() async {
-    GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
-    await drive.init(context, account.user!);
+    FileHandler fileHandler = Provider.of<FileHandler>(context, listen: false);
+    await fileHandler.init(context, account.user!);
     setState(() => loading = false);
   }
 
@@ -43,19 +43,19 @@ class _FileViewerState extends State<FileViewer> {
       );
     }
 
-    return Consumer<GoogleDrive>(
-      builder: (context, drive, child) {
-        if (drive.files.isEmpty) {
+    return Consumer<FileHandler>(
+      builder: (context, fileHandler, child) {
+        if (fileHandler.files.isEmpty) {
           return const NoResultsPage();
         }
 
         return  WillPopScope(
           onWillPop: () async {
-            if (drive.selections == 0) {
+            if (fileHandler.selections == 0) {
               return true;
             }
             else {
-              drive.clearSelections();
+              fileHandler.clearSelections();
               return false;
             }
           },
@@ -76,9 +76,9 @@ class _FileViewerState extends State<FileViewer> {
                               mainAxisSpacing: 10,
                               crossAxisSpacing: 10,
                             ),
-                            itemCount: drive.files.length,
+                            itemCount: fileHandler.files.length,
                             itemBuilder: (context, index) {
-                              return FileCard(drive.files[index]);
+                              return FileCard(fileHandler.files[index]);
                             },
                           ),
                         ),

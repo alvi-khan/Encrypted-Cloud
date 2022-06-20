@@ -1,5 +1,5 @@
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
-import 'package:encrypted_cloud/utils/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:encrypted_cloud/views/Fullscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,12 +10,12 @@ class ImageFileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GoogleDrive>(
-      builder: (context, drive, child) {
-        int index = drive.files.indexOf(file);
-        if (drive.selections == 0) {
+    return Consumer<FileHandler>(
+      builder: (context, fileHandler, child) {
+        int index = fileHandler.files.indexOf(file);
+        if (fileHandler.selections == 0) {
           return GestureDetector(
-              onLongPress: () => drive.setSelected(index, true),
+              onLongPress: () => fileHandler.setSelected(index, true),
               onTap: () {
                 Navigator.push(
                   context,
@@ -30,7 +30,7 @@ class ImageFileCard extends StatelessWidget {
           );
         }
         return GestureDetector(
-          onTap: () => drive.setSelected(index, !file.selected),
+          onTap: () => fileHandler.setSelected(index, !file.selected),
           child: Stack(
               fit: StackFit.expand,
               children: [

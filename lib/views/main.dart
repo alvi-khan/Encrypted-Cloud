@@ -1,6 +1,6 @@
 import 'package:encrypted_cloud/views/FileViewer.dart';
 import 'package:encrypted_cloud/utils/GoogleAccount.dart';
-import 'package:encrypted_cloud/utils/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:encrypted_cloud/views/SignInPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => GoogleAccount()),
-        ChangeNotifierProvider(create: (context) => GoogleDrive()),
+        ChangeNotifierProvider(create: (context) => FileHandler()),
       ],
       child: const MyApp(),
     ),

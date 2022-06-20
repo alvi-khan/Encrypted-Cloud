@@ -3,7 +3,7 @@ import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:encrypted_cloud/components/filecard/ImageFIleCard.dart';
 import 'package:encrypted_cloud/enums/FileState.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
-import 'package:encrypted_cloud/utils/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,12 +31,12 @@ class FileCard extends StatelessWidget {
       child = validExtensions.any(filename.endsWith) ? ImageFileCard(file: file) : null;
     }
 
-    return Consumer<GoogleDrive>(
-      builder: (context, drive, child) {
+    return Consumer<FileHandler>(
+      builder: (context, fileHandler, child) {
         return ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: GridTile(
-            footer: (filename == "" || drive.selections != 0) ? null : FileCardFooter(text: filename),
+            footer: (filename == "" || fileHandler.selections != 0) ? null : FileCardFooter(text: filename),
             child: Container(
               decoration: BoxDecoration(
                   color: Colors.blueGrey,

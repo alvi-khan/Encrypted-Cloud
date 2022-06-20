@@ -1,6 +1,6 @@
 import 'package:encrypted_cloud/components/FullscreenOptions.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
-import 'package:encrypted_cloud/utils/GoogleDrive.dart';
+import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -27,8 +27,8 @@ class _FullscreenState extends State<Fullscreen> {
 
   @override
   Widget build(BuildContext context) {
-    GoogleDrive drive = Provider.of<GoogleDrive>(context, listen: false);
-    List<DecryptedFile> validFiles = drive.files.where((file) {
+    FileHandler fileHandler = Provider.of<FileHandler>(context, listen: false);
+    List<DecryptedFile> validFiles = fileHandler.files.where((file) {
       return file.data != null && validExtensions.any(file.data!.path.endsWith);
     }).toList();
     PageController controller = PageController(initialPage: validFiles.indexOf(currentFile));
@@ -70,7 +70,7 @@ class _FullscreenState extends State<Fullscreen> {
               DecryptedFile oldFile = currentFile;
               int index = validFiles.indexOf(currentFile);
               index = index + 1 == validFiles.length ? index - 1 : index + 1;
-              drive.deleteFile(oldFile);
+              fileHandler.deleteFile(oldFile);
               if (validFiles.length != 1) {
                 setState(() => currentFile = validFiles[index]);
               } else {

@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:aes_crypt_null_safe/aes_crypt_null_safe.dart';
+import 'package:encrypted_cloud/components/dialog/PasswordDialog.dart';
+import 'package:flutter/material.dart';
 
 class EncryptionHandler {
   String? password;
@@ -10,8 +12,18 @@ class EncryptionHandler {
     crypt.setOverwriteMode(AesCryptOwMode.rename);
   }
 
-  void setPassword(String password) {
-    crypt.setPassword(password);
+  Future<bool> setPassword(BuildContext context) async {
+    if (password == null) {
+      String? password = await showDialog(
+          context: context,
+          builder: (context) => const PasswordDialog()
+      );
+      if (password == null) {
+        return false;
+      }
+      crypt.setPassword(password);
+    }
+    return true;
   }
 
   Future<File> encryptFile(File file) async {
