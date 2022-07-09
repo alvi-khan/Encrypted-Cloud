@@ -18,24 +18,59 @@ class AuthClient extends BaseClient {
 
 class GoogleDrive {
   late drive.DriveApi api;
+  String? root;
+  String? thumbnailsFolder;
 
   void setAuthHeaders(Map<String, String> authHeaders) {
     AuthClient authClient = AuthClient(Client(), authHeaders);
     api = drive.DriveApi(authClient);
   }
 
+  Future<void> getThumbnailFolder() async {
+    if (root == null) return;
+
+    var response = await api.files.list(
+        q: "name='.thumbnails' and "
+            "mimeType='application/vnd.google-apps.folder' and "
+            "'$root' in parents",
+        $fields: "files(id, trashed)",
+    );
+    if (response.files == null) return;
+
+    if (response.files!.isNotEmpty) {
+      for (drive.File file in response.files!) {
+        if (!file.trashed!) {
+          thumbnailsFolder = file.id;
+          return;
+        }
+      }
+    }
+
+    drive.File file = await api.files.create(
+        drive.File(
+            name: '.thumbnails',
+            mimeType: "application/vnd.google-apps.folder",
+          parents: [root!],
+        )
+    );
+    thumbnailsFolder = file.id;
+  }
+
   /// Create new root folder or retrieve existing one.
-  Future<String?> getRoot() async {
+  Future<void> getRoot() async {
     var response = await api.files.list(
         q: "name='Encrypted Cloud' and mimeType='application/vnd.google-apps.folder'",
         $fields: "files(id, trashed)"
     );
-    if (response.files == null) return null;
+    if (response.files == null) return;
 
     // retrieve first non-trashed root
     if (response.files!.isNotEmpty) {
       for (drive.File file in response.files!) {
-        if (!file.trashed!)  return file.id;
+        if (!file.trashed!) {
+          root = file.id;
+          return;
+        }
       }
     }
 
@@ -46,15 +81,23 @@ class GoogleDrive {
             mimeType: "application/vnd.google-apps.folder"
         )
     );
-    return file.id;
+    root = file.id;
   }
 
-  Future<List<drive.File>> getFileList(String root) async {
+  Future<List<drive.File>> getThumbnailList() async {
+    return await getFileList(parent: thumbnailsFolder);
+  }
+
+  Future<List<drive.File>> getFileList({String? parent}) async {
     String? pageToken;
     List<drive.File> newFiles = [];
+
+    parent ??= root;
+    if (parent == null) return newFiles;
+
     do {
       var fileList = await api.files.list(
-          q: "'$root' in parents",
+          q: "'$parent' in parents",
           pageSize: 20,
           pageToken: pageToken,
           supportsAllDrives: false,
@@ -75,7 +118,7 @@ class GoogleDrive {
 
   Future<File> downloadFile(drive.File driveFile, String location) async {
     String filename = driveFile.name ?? DateTime.now().toString();
-    File? file = File("$location${Platform.pathSeparator}$filename");
+    File? file = await File("$location${Platform.pathSeparator}$filename").create(recursive: true);
 
     drive.Media media = await api.files.get(
         driveFile.id!,

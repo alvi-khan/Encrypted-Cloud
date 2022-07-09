@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:encrypted_cloud/components/FullscreenOptions.dart';
+import 'package:encrypted_cloud/enums/FileState.dart';
 import 'package:encrypted_cloud/utils/DecryptedFile.dart';
 import 'package:encrypted_cloud/utils/FileHandler.dart';
 import 'package:flutter/material.dart';
@@ -18,20 +21,23 @@ class _FullscreenState extends State<Fullscreen> {
   final List<String> validExtensions = const [".png", ".jpg"];
   bool optionsVisible = true;
   late DecryptedFile currentFile;
+  late File file;
 
   @override
   void initState() {
     currentFile = widget.tappedFile;
+    file = currentFile.thumbnail!;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    FileHandler fileHandler = Provider.of<FileHandler>(context, listen: false);
+    FileHandler fileHandler = Provider.of<FileHandler>(context);
     List<DecryptedFile> validFiles = fileHandler.files.where((file) {
-      return file.data != null && validExtensions.any(file.data!.path.endsWith);
+      return file.thumbnail != null && validExtensions.any(file.thumbnail!.path.endsWith);
     }).toList();
     PageController controller = PageController(initialPage: validFiles.indexOf(currentFile));
+    fileHandler.downloadFullFile(currentFile);
 
     // TODO hide status bar once flutter/flutter#95403 is resolved
 
@@ -46,6 +52,7 @@ class _FullscreenState extends State<Fullscreen> {
               color: Colors.black,
               child: PhotoViewGallery.builder(
                 onPageChanged: (index) {
+                  fileHandler.downloadFullFile(validFiles[index]);
                   setState(() => currentFile = validFiles[index]);
                 },
                 enableRotation: false,
@@ -53,8 +60,9 @@ class _FullscreenState extends State<Fullscreen> {
                 itemCount: validFiles.length,
                 pageController: controller,
                 builder: (BuildContext context, int index) {
+                  DecryptedFile file = validFiles[index];
                   return PhotoViewGalleryPageOptions(
-                    imageProvider: FileImage(validFiles[index].data!),
+                    imageProvider: FileImage(file.state == FileState.available ? file.data! : file.thumbnail!),
                     initialScale: PhotoViewComputedScale.contained * 0.999,
                     minScale: PhotoViewComputedScale.contained * 0.999,
                     // TODO remove * 0.999 once bluefireteam/photo_view#383 is resolved
@@ -65,7 +73,7 @@ class _FullscreenState extends State<Fullscreen> {
           ),
           FullscreenOptions(
             optionsVisible: optionsVisible,
-            onSave: () => currentFile.saveLocally(),
+            onSave: () => fileHandler.saveFile(currentFile),
             onDelete: () {
               DecryptedFile oldFile = currentFile;
               int index = validFiles.indexOf(currentFile);

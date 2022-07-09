@@ -26,7 +26,7 @@ class ImageFileCard extends StatelessWidget {
                   ),
                 );
               },
-              child: Image.file(file.data!, fit: BoxFit.cover)
+              child: Image.file(file.thumbnail!, fit: BoxFit.cover)
           );
         }
         return GestureDetector(
@@ -38,7 +38,7 @@ class ImageFileCard extends StatelessWidget {
                   padding: file.selected ? const EdgeInsets.all(10) : EdgeInsets.zero,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.file(file.data!, fit: BoxFit.cover),
+                    child: Image.file(file.thumbnail!, fit: BoxFit.cover),
                   ),
                 ),
                 Container(

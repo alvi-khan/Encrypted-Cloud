@@ -4,16 +4,19 @@ import 'package:encrypted_cloud/enums/FileState.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DecryptedFile {
-  String id;
+  String id = "";
   File? data;
-  FileState state;
-  bool selected;
+  String thumbnailId = "";
+  File? thumbnail;
+  FileState state = FileState.loading;
+  FileState thumbnailState = FileState.loading;
+  bool selected = false;
 
-  DecryptedFile({required this.data, this.id = "", this.state = FileState.loading, this.selected = false});
+  DecryptedFile();
 
   String? getFileName() {
-    if (data == null)  return null;
-    return data!.path.split(Platform.pathSeparator).last;
+    if (thumbnail == null)  return null;
+    return thumbnail!.path.split(Platform.pathSeparator).last;
   }
 
   void saveLocally() async {
@@ -26,7 +29,7 @@ class DecryptedFile {
     }
     Directory downloadsDir = Directory('/storage/emulated/0/Download');
     String filepath = "${downloadsDir.path}/${getFileName()!}";
-    File savedFile = File(filepath);
+    File savedFile = await File(filepath).create(recursive: true);
     savedFile.writeAsBytesSync(data!.readAsBytesSync());
     // TODO show progress
   }

@@ -18,15 +18,15 @@ class FileCard extends StatelessWidget {
     String filename = "";
     Widget? child;
 
-    if (file.state == FileState.loading) {
+    if (file.thumbnailState == FileState.loading) {
       child = LoadingIndicator(size: 100, strokeWidth: 7, color: Colors.blueGrey.shade200);
     }
 
-    if (file.state == FileState.error) {
+    if (file.thumbnailState == FileState.error) {
       child = Icon(Icons.error_outline_rounded, size: 100, color: Colors.blueGrey.shade200);
     }
 
-    if (file.state == FileState.available) {
+    if (file.thumbnailState == FileState.available) {
       filename = file.getFileName()!;
       child = validExtensions.any(filename.endsWith) ? ImageFileCard(file: file) : null;
     }
