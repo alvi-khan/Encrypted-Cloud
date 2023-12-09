@@ -16,7 +16,7 @@ class ThumbnailGenerator {
     String filename = file.path.split(Platform.pathSeparator).last;
     Image? image = decodeImage(file.readAsBytesSync());
     Image thumbnail = copyResize(image!, width: 600);
-    thumbnail = copyRotate(thumbnail, 90);
+    thumbnail = copyRotate(thumbnail, angle: 90);
     File thumbnailFile = await File('$directory${Platform.pathSeparator}$filename').create(recursive: true);
     thumbnailFile.writeAsBytesSync(encodeJpg(thumbnail));
     return thumbnailFile;
@@ -26,7 +26,7 @@ class ThumbnailGenerator {
     String filename = file.path.split(Platform.pathSeparator).last;
     Image? image = decodeImage(file.readAsBytesSync());
     Image thumbnail = copyResize(image!, width: 600);
-    thumbnail = copyRotate(thumbnail, 90);
+    thumbnail = copyRotate(thumbnail, angle: 90);
     File thumbnailFile = await File('$directory${Platform.pathSeparator}$filename').create(recursive: true);
     thumbnailFile.writeAsBytesSync(encodePng(thumbnail));
     return thumbnailFile;

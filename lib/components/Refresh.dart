@@ -13,7 +13,6 @@ class Refresh extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomRefreshIndicator(
-      loadingToIdleDuration: resetTime,
       onRefresh: () => onRefresh(),
       builder: (context, child, controller) {
         return Stack(
