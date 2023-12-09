@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PasswordDialog extends StatefulWidget {
-  const PasswordDialog({Key? key}) : super(key: key);
+  const PasswordDialog({super.key});
 
   @override
   State<PasswordDialog> createState() => _PasswordDialogState();
@@ -55,7 +55,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
           style: ElevatedButton.styleFrom(
               textStyle: const TextStyle(fontSize: 20),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              primary: Colors.blueGrey.shade400,
+              backgroundColor: Colors.blueGrey.shade400,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
           ),
           child: const Text("Continue"),

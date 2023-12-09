@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ImageFileCard extends StatelessWidget {
-  const ImageFileCard({Key? key, required this.file}) : super(key: key);
+  const ImageFileCard({super.key, required this.file});
   final DecryptedFile file;
 
   @override

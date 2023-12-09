@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DeleteFileConfirmationDialog extends StatefulWidget {
-  const DeleteFileConfirmationDialog({Key? key, required this.fileCount}) : super(key: key);
+  const DeleteFileConfirmationDialog({super.key, required this.fileCount});
 
   final int fileCount;
 
@@ -30,7 +30,7 @@ class _DeleteFileConfirmationDialogState extends State<DeleteFileConfirmationDia
           style: ElevatedButton.styleFrom(
             textStyle: const TextStyle(fontSize: 18),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            primary: Colors.blueGrey.shade400,
+            backgroundColor: Colors.blueGrey.shade400,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             fixedSize: const Size(100, 50),
           ),
@@ -42,7 +42,7 @@ class _DeleteFileConfirmationDialogState extends State<DeleteFileConfirmationDia
           style: ElevatedButton.styleFrom(
             textStyle: const TextStyle(fontSize: 18),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            primary: Colors.redAccent.shade200,
+            backgroundColor: Colors.redAccent.shade200,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             fixedSize: const Size(100, 50),
           ),

@@ -153,13 +153,17 @@ class FileHandler extends ChangeNotifier{
   }
 
   void clearSelections() {
-    files.forEach((file) => file.selected = false);
+    for (var file in files) {
+      file.selected = false;
+    }
     selections = 0;
     notifyListeners();
   }
 
   void selectAll() {
-    files.forEach((file) => file.selected = true);
+    for (var file in files) {
+      file.selected = true;
+    }
     selections = files.length;
     notifyListeners();
   }

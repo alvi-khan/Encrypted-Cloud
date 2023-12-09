@@ -3,7 +3,7 @@ import 'package:encrypted_cloud/components/appbar/ProfileMenuButton.dart';
 import 'package:flutter/material.dart';
 
 class NoResultsPage extends StatelessWidget {
-  const NoResultsPage({Key? key}) : super(key: key);
+  const NoResultsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

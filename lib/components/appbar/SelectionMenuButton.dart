@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SelectionMenuButton extends StatelessWidget {
-  const SelectionMenuButton({Key? key}) : super(key: key);
+  const SelectionMenuButton({super.key});
 
   void deleteFiles(BuildContext context, FileHandler fileHandler) async {
     await Future.delayed(Duration.zero, () => {});
@@ -37,8 +37,8 @@ class SelectionMenuButton extends StatelessWidget {
                   },
                   enabled: selections != 0,
                   textStyle: const TextStyle(color: Colors.white),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Icon(Icons.save_alt_rounded),
                       SizedBox(width: 10),
                       Text("Download"),
@@ -49,8 +49,8 @@ class SelectionMenuButton extends StatelessWidget {
                   onTap: () => fileHandler.selectAll(),
                   enabled: selections != fileHandler.files.length,
                   textStyle: const TextStyle(color: Colors.white),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Icon(Icons.check_rounded),
                       SizedBox(width: 10),
                       Text("Select All"),
@@ -61,8 +61,8 @@ class SelectionMenuButton extends StatelessWidget {
                   onTap: () => deleteFiles(context, fileHandler),
                   enabled: selections != 0,
                   textStyle: const TextStyle(color: Colors.white),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Icon(Icons.delete_rounded),
                       SizedBox(width: 10),
                       Text("Delete"),

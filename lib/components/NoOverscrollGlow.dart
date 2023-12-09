@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NoOverscrollGlow extends StatelessWidget {
-  const NoOverscrollGlow({Key? key, required this.child}) : super(key: key);
+  const NoOverscrollGlow({super.key, required this.child});
 
   final Widget child;
 

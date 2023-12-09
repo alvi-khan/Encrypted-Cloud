@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class UploadButton extends StatelessWidget {
-  const UploadButton({Key? key}) : super(key: key);
+  const UploadButton({super.key});
 
   @override
   Widget build(BuildContext context) {

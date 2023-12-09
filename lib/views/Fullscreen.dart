@@ -10,7 +10,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 class Fullscreen extends StatefulWidget {
-  const Fullscreen({Key? key, required this.tappedFile}) : super(key: key);
+  const Fullscreen({super.key, required this.tappedFile});
   final DecryptedFile tappedFile;
 
   @override

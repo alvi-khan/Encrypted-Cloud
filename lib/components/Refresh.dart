@@ -3,7 +3,7 @@ import 'package:encrypted_cloud/components/LoadingIndicator.dart';
 import 'package:flutter/material.dart';
 
 class Refresh extends StatelessWidget {
-  const Refresh({Key? key, required this.child, required this.onRefresh}) : super(key: key);
+  const Refresh({super.key, required this.child, required this.onRefresh});
 
   final Widget child;
   final Function onRefresh;

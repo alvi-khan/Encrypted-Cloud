@@ -2,7 +2,7 @@ import 'package:encrypted_cloud/components/dialog/DeleteFileConfirmationDialog.d
 import 'package:flutter/material.dart';
 
 class FullscreenOptions extends StatelessWidget {
-  const FullscreenOptions({Key? key, required this.optionsVisible, required this.onDelete, required this.onSave}) : super(key: key);
+  const FullscreenOptions({super.key, required this.optionsVisible, required this.onDelete, required this.onSave});
   final bool optionsVisible;
   final Function onDelete;
   final Function onSave;

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProfileMenuButton extends StatelessWidget {
-  const ProfileMenuButton({Key? key}) : super(key: key);
+  const ProfileMenuButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +32,8 @@ class ProfileMenuButton extends StatelessWidget {
           PopupMenuItem logoutButton = PopupMenuItem(
               onTap: () => account.signOut(),
               textStyle: const TextStyle(color: Colors.white),
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Icon(Icons.logout_rounded),
                   SizedBox(width: 10),
                   Text("Log Out"),

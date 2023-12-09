@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class BasicAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const BasicAppBar({Key? key}) : super(key: key);
+  const BasicAppBar({super.key});
 
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);

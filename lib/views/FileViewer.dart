@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FileViewer extends StatefulWidget {
-  const FileViewer({Key? key}) : super(key: key);
+  const FileViewer({super.key});
 
   @override
   State<FileViewer> createState() => _FileViewerState();

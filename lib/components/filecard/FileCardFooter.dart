@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FileCardFooter extends StatelessWidget {
-  const FileCardFooter({Key? key, required this.text}) : super(key: key);
+  const FileCardFooter({super.key, required this.text});
   final String? text;
 
   @override

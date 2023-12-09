@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FileCard extends StatelessWidget {
-  const FileCard(this.file, {Key? key}) : super(key: key);
+  const FileCard(this.file, {super.key});
 
   final DecryptedFile file;
   final List<String> validExtensions = const [".png", ".jpg"];
